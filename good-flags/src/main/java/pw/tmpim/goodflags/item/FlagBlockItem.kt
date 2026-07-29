@@ -74,10 +74,10 @@ class FlagBlockItem(id: Int) : BlockItem(id), ItemWithRenderer {
     // Flag preview area within the item icon — driven by config
     val baseRes     = cfg.itemTextureResolution ?: 16
     val scale       = 16.0 / baseRes // pixel scale factor relative to standard 16×16
-    val flagOffsetX = cfg.flagPreviewX ?: 3
-    val flagOffsetY = cfg.flagPreviewY ?: 0
-    val previewW    = cfg.flagPreviewWidth ?: 12
-    val previewH    = cfg.flagPreviewHeight ?: 8
+    val flagOffsetX = cfg.flagPreviewX ?: 1
+    val flagOffsetY = cfg.flagPreviewY ?: 3
+    val previewW    = cfg.flagPreviewWidth ?: 14
+    val previewH    = cfg.flagPreviewHeight ?: 12
 
     // Downsample the 48x32 canvas into preview size using mode sampling.
     // Each preview pixel covers a rectangular region of the source canvas.
