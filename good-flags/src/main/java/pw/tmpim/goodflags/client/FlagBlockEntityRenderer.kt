@@ -87,7 +87,7 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
     gameAtlas.bindTexture()
 
     val atlas = Atlases.getTerrain()
-    val woodBlockSideId = Block.WOOL.getTexture(2, 12)
+    val woodBlockSideId = Block.PLANKS.getTexture(2)
     val woodBlockSideSprite = atlas.getTexture(woodBlockSideId)
 
     val uSize = woodBlockSideSprite.endU - woodBlockSideSprite.startU
@@ -112,11 +112,10 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
     t.startQuads()
 
     // North face (negative Z)
-    t.vertex(flagLeft,  flagTop,    flagZFront, uSideStart + uSize / 16, vSideStart)
-    t.vertex(flagLeft,  flagBottom, flagZFront, uSideStart + uSize / 16, vSideEnd)
-    t.vertex(flagRight, flagBottom, flagZFront, uSideEnd + uSize / 16,   vSideEnd)
-    t.vertex(flagRight, flagTop,    flagZFront, uSideEnd + uSize / 16,   vSideStart)
-
+    t.vertex(flagLeft,  flagTop,    flagZFront, woodBlockSideSprite.startU, woodBlockSideSprite.startV) //top left
+    t.vertex(flagLeft,  flagBottom, flagZFront, woodBlockSideSprite.startU, woodBlockSideSprite.endV) //bottom left
+    t.vertex(flagRight, flagBottom, flagZFront, woodBlockSideSprite.endU,   woodBlockSideSprite.endV) //bottom right
+    t.vertex(flagRight, flagTop,    flagZFront, woodBlockSideSprite.endU,   woodBlockSideSprite.startV) //top right
     t.draw()
     GL11.glColor4f(
       zLight,
@@ -141,16 +140,22 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
       light, 1.0F)
     t.startQuads()
     // Top face
-    t.vertex(flagLeft,  flagTop, flagZBack,  uEndsStart, vEndsStart)
-    t.vertex(flagLeft,  flagTop, flagZFront, uEndsStart, vEndsEnd)
-    t.vertex(flagRight, flagTop, flagZFront, uEndsEnd,   vEndsEnd)
-    t.vertex(flagRight, flagTop, flagZBack,  uEndsEnd,   vEndsStart)
+    t.vertex(flagLeft,  flagTop, flagZBack,  woodBlockSideSprite.startU, woodBlockSideSprite.startV) //top left
+    t.vertex(flagLeft,  flagTop, flagZFront, woodBlockSideSprite.startU, woodBlockSideSprite.startV + vSize / 16) //bottom left
+    t.vertex(flagRight, flagTop, flagZFront, woodBlockSideSprite.endU,   woodBlockSideSprite.startV + vSize / 16) //bottom right
+    t.vertex(flagRight, flagTop, flagZBack,  woodBlockSideSprite.endU,   woodBlockSideSprite.startV) //top right
 
-    // Bottom face :pleading:
-    t.vertex(flagLeft,  flagBottom, flagZFront, uEndsStart, vEndsStart)
-    t.vertex(flagLeft,  flagBottom, flagZBack,  uEndsStart, vEndsEnd)
-    t.vertex(flagRight, flagBottom, flagZBack,  uEndsEnd,   vEndsEnd)
-    t.vertex(flagRight, flagBottom, flagZFront, uEndsEnd,   vEndsStart)
+    t.draw()
+    GL11.glColor4f(
+      yLight,
+      yLight,
+      yLight, 1.0F)
+    t.startQuads()
+    // 🥺
+    t.vertex(flagLeft,  flagBottom, flagZFront, woodBlockSideSprite.startU, woodBlockSideSprite.startV) //top left
+    t.vertex(flagLeft,  flagBottom, flagZBack,  woodBlockSideSprite.startU, woodBlockSideSprite.startV + vSize / 16) //bottom left
+    t.vertex(flagRight, flagBottom, flagZBack,  woodBlockSideSprite.endU,   woodBlockSideSprite.startV + vSize / 16) //bottom right
+    t.vertex(flagRight, flagBottom, flagZFront, woodBlockSideSprite.endU,   woodBlockSideSprite.startV) //top right
 
     t.draw()
   }

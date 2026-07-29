@@ -8,12 +8,13 @@ import net.minecraft.block.material.Material
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
+import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.MathHelper
+import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import net.modificationstation.stationapi.api.block.HasCustomBlockItemFactory
 import net.modificationstation.stationapi.api.template.block.TemplateBlockWithEntity
-import pw.tmpim.goodflags.GoodFlags
 import pw.tmpim.goodflags.GoodFlags.namespace
 import pw.tmpim.goodflags.item.FlagBlockItem
 import pw.tmpim.goodflags.net.FlagNetworkingS2C
@@ -28,7 +29,7 @@ class FlagBlock : TemplateBlockWithEntity(namespace.id("flag"), Material.WOOD), 
     setHardness(1.0F)
     setResistance(1.0F)
     setSoundGroup(WOOD_SOUND_GROUP)
-    applyBoundingBox(this)
+    //applyBoundingBox(this)
   }
 
   companion object {
@@ -65,53 +66,85 @@ class FlagBlock : TemplateBlockWithEntity(namespace.id("flag"), Material.WOOD), 
   }
 
   //ztodo: edit placeable logic
-  override fun canPlaceAt(world: World, x: Int, y: Int, z: Int) =
-    y + 2 < 128
-      && world.getMaterial(x, y - 1, z).suffocates()
-      && world.getBlockId(x, y + 1, z) == 0
-      && world.getBlockId(x, y + 2, z) == 0
+  override fun canPlaceAt(world: World, x: Int, y: Int, z: Int) = true
+    //y + 2 < 128
+    //  && world.getMaterial(x, y - 1, z).suffocates()
+    //  && world.getBlockId(x, y + 1, z) == 0
+    //  && world.getBlockId(x, y + 2, z) == 0
 
   override fun onPlaced(world: World, x: Int, y: Int, z: Int, placer: LivingEntity) {
     val rotation = (MathHelper.floor((placer.yaw * 4.0F / 360.0F) + 0.5) and 3)
     world.setBlockMeta(x, y, z, rotation)
-    val poleId = GoodFlags.flagPoleBlock.id
-    world.setBlock(x, y + 1, z, poleId)
-    world.setBlock(x, y + 2, z, poleId)
+
+    val var8 = 0.15f
+    this.setBoundingBox(0.0f, 0.2f, 0.5f - var8, var8 * 2.0f, 0.8f, 0.5f + var8)
+    //val poleId = GoodFlags.flagPoleBlock.id
+    //world.setBlock(x, y + 1, z, poleId)
+    //world.setBlock(x, y + 2, z, poleId)
+  }
+  override fun raycast(world: World, x: Int, y: Int, z: Int, startPos: Vec3d?, endPos: Vec3d?): HitResult? {
+    val rot = world.getBlockMeta(x, y, z) and 7
+    var thick = 0.09375f //thickness of frame including float-off-wall portion
+    var half = 1f / 32f; //half a pixel width
+    if (rot == 0) { //Faces North
+      this.setBoundingBox(
+        0.0f, 0.0f, 1.0f-thick,
+        1.0f, 1.0f, 1.0f-half)
+    } else if (rot == 1) { //Faces East
+      this.setBoundingBox(
+        half, 0.0f, 0.0f,
+        thick, 1.0f, 1.0f)
+    } else if (rot == 2) { //Faces South
+      this.setBoundingBox(
+        0.0f, 0.0f, half,
+        1.0f, 1.0f, thick)
+    } else if (rot == 3) { //Faces West
+      this.setBoundingBox(
+        1.0f-thick, 0.0f, 0.0f,
+        1.0f-half, 1.0f, 1.0f)
+    } else {
+      thick = 0.1f
+      this.setBoundingBox(
+        0.0f, 0.0f, 0.0f,
+        1.0f, 1.0f, 1.0f)
+    }
+
+    return super.raycast(world, x, y, z, startPos, endPos)
   }
 
   override fun neighborUpdate(world: World, x: Int, y: Int, z: Int, id: Int) {
-    val poleId = GoodFlags.flagPoleBlock.id
-    val meta = world.getBlockMeta(x, y, z)
-    var broken = false
-
-    // The pole at y+1 must exist — if it was mined away the structure is invalid
-    if (world.getBlockId(x, y + 1, z) != poleId) {
-      broken = true
-      // Silently remove the top pole too if it's still there
-      if (world.getBlockId(x, y + 2, z) == poleId) {
-        world.setBlock(x, y + 2, z, 0)
-      }
-    }
-
-    // The floor below must be solid
-    if (!world.getMaterial(x, y - 1, z).suffocates()) {
-      broken = true
-      // Silently remove both pole blocks above
-      if (world.getBlockId(x, y + 1, z) == poleId) {
-        world.setBlock(x, y + 1, z, 0)
-      }
-      if (world.getBlockId(x, y + 2, z) == poleId) {
-        world.setBlock(x, y + 2, z, 0)
-      }
-    }
-
-    // Double check that we still exist before dropping a stack.
-    if (broken && world.getBlockId(x, y, z) == this.id) {
-      if (!world.isRemote) {
-        dropStacks(world, x, y, z, meta)
-      }
-      world.setBlock(x, y, z, 0)
-    }
+    //val poleId = GoodFlags.flagPoleBlock.id
+    //val meta = world.getBlockMeta(x, y, z)
+    //var broken = false
+//
+    //// The pole at y+1 must exist — if it was mined away the structure is invalid
+    //if (world.getBlockId(x, y + 1, z) != poleId) {
+    //  broken = true
+    //  // Silently remove the top pole too if it's still there
+    //  if (world.getBlockId(x, y + 2, z) == poleId) {
+    //    world.setBlock(x, y + 2, z, 0)
+    //  }
+    //}
+//
+    //// The floor below must be solid
+    //if (!world.getMaterial(x, y - 1, z).suffocates()) {
+    //  broken = true
+    //  // Silently remove both pole blocks above
+    //  if (world.getBlockId(x, y + 1, z) == poleId) {
+    //    world.setBlock(x, y + 1, z, 0)
+    //  }
+    //  if (world.getBlockId(x, y + 2, z) == poleId) {
+    //    world.setBlock(x, y + 2, z, 0)
+    //  }
+    //}
+//
+    //// Double check that we still exist before dropping a stack.
+    //if (broken && world.getBlockId(x, y, z) == this.id) {
+    //  if (!world.isRemote) {
+    //    dropStacks(world, x, y, z, meta)
+    //  }
+    //  world.setBlock(x, y, z, 0)
+    //}
   }
 
   override fun dropStacks(world: World, x: Int, y: Int, z: Int, meta: Int, luck: Float) {
