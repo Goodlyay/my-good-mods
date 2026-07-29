@@ -33,8 +33,22 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
       else -> 0.0F
     }
 
-    // Get the light level at the flag (+2 y)
-    val flagLight = dispatcher.world.getNaturalBrightness(entity.x, entity.y + 2, entity.z, 0)
+    val light = dispatcher.world.getNaturalBrightness(entity.x, entity.y, entity.z, 0)
+    val xLight = when (meta) {
+      0 -> light * 0.8f
+      1 -> light * 0.6f
+      2 -> light * 0.8f
+      3 -> light * 0.6f
+      else -> 0.4f
+    }
+    val zLight = when (meta) {
+      0 -> light * 0.6f
+      1 -> light * 0.8f
+      2 -> light * 0.6f
+      3 -> light * 0.8f
+      else -> 0.4f
+    }
+    val yLight = light * 0.4f
 
     Lighting.turnOff()
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
@@ -50,97 +64,108 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
     GL11.glTranslated(dx + 0.5, dy, dz + 0.5)
     GL11.glRotatef(-rotation, 0.0F, 1.0F, 0.0F)
 
-    // Draw the pole
-    drawPole()
-
-    // Draw the flag
-    drawFlag(entity, flagLight)
+    drawPole(light, xLight, zLight, yLight)
+    drawFlag(entity, light, xLight, zLight, yLight)
 
     GL11.glPopMatrix()
 
     Lighting.turnOn()
   }
 
-  private fun drawPole() {
-    // Pole dimensions: thin column from y=0 to y=3
-    val poleRadius = 0.0625 // 1/16 of a block
-    val poleHeight = 3.0
+  private fun drawPole(light: Float, xLight : Float, zLight : Float, yLight : Float) {
+    val flagWidth  = 1.0
+    val flagHeight = 1.0
+    val flagTop    = 1.0
+    val flagBottom = flagTop - flagHeight
+    val flagRight  = 0.5
+    val flagLeft   = flagRight - flagWidth
+    val flagThickness = 0.0625
+    val flagZFront    = 0.5 - 0.03125
+    val flagZBack     = flagZFront - flagThickness
 
     val gameAtlas = StationRenderAPI.getBakedModelManager().getAtlas(Atlases.GAME_ATLAS_TEXTURE)
     gameAtlas.bindTexture()
 
-    val t = Tessellator.INSTANCE
-    t.startQuads()
-
     val atlas = Atlases.getTerrain()
-    val woodBlockSideId = Block.LOG.getTexture(2)
+    val woodBlockSideId = Block.WOOL.getTexture(2, 12)
     val woodBlockSideSprite = atlas.getTexture(woodBlockSideId)
 
     val uSize = woodBlockSideSprite.endU - woodBlockSideSprite.startU
     val vSize = woodBlockSideSprite.endV - woodBlockSideSprite.startV
-
     val uSideStart = woodBlockSideSprite.startU
-    val uSideEnd   = woodBlockSideSprite.startU + uSize / 8
+    val uSideEnd   = woodBlockSideSprite.startU + uSize / 16
     val vSideStart = woodBlockSideSprite.startV
     val vSideEnd   = woodBlockSideSprite.endV
-
     val uEndsStart = woodBlockSideSprite.startU
-    val uEndsEnd   = woodBlockSideSprite.startU + uSize / 8
+    val uEndsEnd   = woodBlockSideSprite.startU + uSize / 16
     val vEndsStart = woodBlockSideSprite.startV
-    val vEndsEnd   = woodBlockSideSprite.startV + vSize / 8
+    val vEndsEnd   = woodBlockSideSprite.startV + vSize / 16
 
-    // Side faces: 3 quads per face, each covering 1 block segment
-    for (i in 0 until 3) {
-      val yBottom = i.toDouble()
-      val yTop    = yBottom + 1.0
+    val yBottom = 0.0
+    val yTop    = yBottom + 1.0
 
-      // Front face (positive Z)
-      t.vertex(-poleRadius, yTop,    poleRadius, uSideStart, vSideStart)
-      t.vertex(-poleRadius, yBottom, poleRadius, uSideStart, vSideEnd)
-      t.vertex( poleRadius, yBottom, poleRadius, uSideEnd,   vSideEnd)
-      t.vertex( poleRadius, yTop,    poleRadius, uSideEnd,   vSideStart)
+    val t = Tessellator.INSTANCE
+    GL11.glColor4f(
+      xLight,
+      xLight,
+      xLight, 1.0F)
+    t.startQuads()
 
-      // Back face (negative Z)
-      t.vertex( poleRadius, yTop,    -poleRadius, uSideStart + uSize / 8, vSideStart)
-      t.vertex( poleRadius, yBottom, -poleRadius, uSideStart + uSize / 8, vSideEnd)
-      t.vertex(-poleRadius, yBottom, -poleRadius, uSideEnd + uSize / 8,   vSideEnd)
-      t.vertex(-poleRadius, yTop,    -poleRadius, uSideEnd + uSize / 8,   vSideStart)
+    // North face (negative Z)
+    t.vertex(flagLeft,  flagTop,    flagZFront, uSideStart + uSize / 16, vSideStart)
+    t.vertex(flagLeft,  flagBottom, flagZFront, uSideStart + uSize / 16, vSideEnd)
+    t.vertex(flagRight, flagBottom, flagZFront, uSideEnd + uSize / 16,   vSideEnd)
+    t.vertex(flagRight, flagTop,    flagZFront, uSideEnd + uSize / 16,   vSideStart)
 
-      // Left face (negative X)
-      t.vertex(-poleRadius, yTop,    -poleRadius, uSideStart + 2*uSize / 8, vSideStart)
-      t.vertex(-poleRadius, yBottom, -poleRadius, uSideStart + 2*uSize / 8, vSideEnd)
-      t.vertex(-poleRadius, yBottom,  poleRadius, uSideEnd + 2*uSize / 8,   vSideEnd)
-      t.vertex(-poleRadius, yTop,     poleRadius, uSideEnd + 2*uSize / 8,   vSideStart)
+    t.draw()
+    GL11.glColor4f(
+      zLight,
+      zLight,
+      zLight, 1.0F)
+    t.startQuads()
+    // Left face (negative X)
+    t.vertex(flagRight, flagTop,    flagZFront, uSideStart + 2*uSize / 16, vSideStart)
+    t.vertex(flagRight, flagBottom, flagZFront, uSideStart + 2*uSize / 16, vSideEnd)
+    t.vertex(flagRight, flagBottom, flagZBack,  uSideEnd + 2*uSize / 16,   vSideEnd)
+    t.vertex(flagRight, flagTop,    flagZBack,  uSideEnd + 2*uSize / 16,   vSideStart)
+    // Right face (positive X)
+    t.vertex(flagLeft, flagTop,    flagZFront, uSideStart + 3*uSize / 16, vSideStart)
+    t.vertex(flagLeft, flagBottom, flagZFront, uSideStart + 3*uSize / 16, vSideEnd)
+    t.vertex(flagLeft, flagBottom, flagZBack,  uSideEnd + 3*uSize / 16,   vSideEnd)
+    t.vertex(flagLeft, flagTop,    flagZBack,  uSideEnd + 3*uSize / 16,   vSideStart)
 
-      // Right face (positive X)
-      t.vertex(poleRadius, yTop,     poleRadius, uSideStart + 3*uSize / 8, vSideStart)
-      t.vertex(poleRadius, yBottom,  poleRadius, uSideStart + 3*uSize / 8, vSideEnd)
-      t.vertex(poleRadius, yBottom, -poleRadius, uSideEnd + 3*uSize / 8,   vSideEnd)
-      t.vertex(poleRadius, yTop,    -poleRadius, uSideEnd + 3*uSize / 8,   vSideStart)
-    }
-
+    t.draw()
+    GL11.glColor4f(
+      light,
+      light,
+      light, 1.0F)
+    t.startQuads()
     // Top face
-    t.vertex(-poleRadius, poleHeight, -poleRadius, uEndsStart, vEndsStart)
-    t.vertex(-poleRadius, poleHeight,  poleRadius, uEndsStart, vEndsEnd)
-    t.vertex( poleRadius, poleHeight,  poleRadius, uEndsEnd,   vEndsEnd)
-    t.vertex( poleRadius, poleHeight, -poleRadius, uEndsEnd,   vEndsStart)
+    t.vertex(flagLeft,  flagTop, flagZBack,  uEndsStart, vEndsStart)
+    t.vertex(flagLeft,  flagTop, flagZFront, uEndsStart, vEndsEnd)
+    t.vertex(flagRight, flagTop, flagZFront, uEndsEnd,   vEndsEnd)
+    t.vertex(flagRight, flagTop, flagZBack,  uEndsEnd,   vEndsStart)
+
+    // Bottom face :pleading:
+    t.vertex(flagLeft,  flagBottom, flagZFront, uEndsStart, vEndsStart)
+    t.vertex(flagLeft,  flagBottom, flagZBack,  uEndsStart, vEndsEnd)
+    t.vertex(flagRight, flagBottom, flagZBack,  uEndsEnd,   vEndsEnd)
+    t.vertex(flagRight, flagBottom, flagZFront, uEndsEnd,   vEndsStart)
 
     t.draw()
   }
 
-  private fun drawFlag(entity: FlagBlockEntity, light: Float) {
+  private fun drawFlag(entity: FlagBlockEntity, light: Float, xLight : Float, zLight : Float, yLight : Float) {
     // Flag extends from the pole to the right, at the top of the pole (3:2 ratio)
-    val flagWidth  = 1.5 // 1.5 blocks wide
-    val flagHeight = 1.0 // 1 block tall
-    val flagTop    = 3.0 // Top of the flag (at top of pole)
+    val flagWidth  = 1.0
+    val flagHeight = 1.0
+    val flagTop    = 1.0
     val flagBottom = flagTop - flagHeight
-    val flagRight  = -0.0625 // Start just past the pole
+    val flagRight  = 0.5
     val flagLeft   = flagRight - flagWidth
-
-    // Thickness: 1 pixel (1/32 block), centred on the pole's Z plane
-    val flagThickness = 0.0625 / 2
-    val flagZFront    = flagThickness / 2.0
-    val flagZBack     = -flagThickness / 2.0
+    val flagThickness = 0.0625
+    val flagZFront    = 0.5 - 0.03125
+    val flagZBack     = flagZFront - flagThickness
 
     // UV edge fractions for the edge strips
     val uMin = 0.0
@@ -156,42 +181,62 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
     GL11.glEnable(GL11.GL_TEXTURE_2D)
     GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId)
 
-    GL11.glColor4f(light, light, light, 1.0F)
+    GL11.glColor4f(
+      xLight,
+      xLight,
+      xLight, 1.0F)
 
     val t = Tessellator.INSTANCE
     t.startQuads()
 
     // Front face of the flag (positive Z)
-    t.vertex(flagLeft,  flagTop,    flagZFront, uMax, vMin)
-    t.vertex(flagLeft,  flagBottom, flagZFront, uMax, vMax)
-    t.vertex(flagRight, flagBottom, flagZFront, uMin, vMax)
-    t.vertex(flagRight, flagTop,    flagZFront, uMin, vMin)
-
-    // Back face of the flag (negative Z, reversed winding, mirrored U)
+    //t.vertex(flagLeft,  flagTop,    flagZFront, uMax, vMin)
+    //t.vertex(flagLeft,  flagBottom, flagZFront, uMax, vMax)
+    //t.vertex(flagRight, flagBottom, flagZFront, uMin, vMax)
+    //t.vertex(flagRight, flagTop,    flagZFront, uMin, vMin)
+    // South face of the flag (negative Z, reversed winding, mirrored U)
     t.vertex(flagRight, flagTop,    flagZBack, uMin, vMin)
     t.vertex(flagRight, flagBottom, flagZBack, uMin, vMax)
     t.vertex(flagLeft,  flagBottom, flagZBack, uMax, vMax)
     t.vertex(flagLeft,  flagTop,    flagZBack, uMax, vMin)
 
-    // Top edge – uses the top row of the texture (vMin..vTopRow)
-    t.vertex(flagLeft,  flagTop, flagZBack,  uMax, vMin)
-    t.vertex(flagLeft,  flagTop, flagZFront, uMax, vTopRow)
-    t.vertex(flagRight, flagTop, flagZFront, uMin, vTopRow)
-    t.vertex(flagRight, flagTop, flagZBack,  uMin, vMin)
-
-    // Bottom edge – uses the bottom row of the texture (vBottomRow..vMax)
-    t.vertex(flagLeft,  flagBottom, flagZFront, uMax, vBottomRow)
-    t.vertex(flagLeft,  flagBottom, flagZBack,  uMax, vMax)
-    t.vertex(flagRight, flagBottom, flagZBack,  uMin, vMax)
-    t.vertex(flagRight, flagBottom, flagZFront, uMin, vBottomRow)
-
-    // Right (free) edge – uses the rightmost column (uMax..uRightCol)
-    t.vertex(flagLeft, flagTop,    flagZFront, uMax,      vMin)
-    t.vertex(flagLeft, flagBottom, flagZFront, uMax,      vMax)
-    t.vertex(flagLeft, flagBottom, flagZBack,  uRightCol, vMax)
-    t.vertex(flagLeft, flagTop,    flagZBack,  uRightCol, vMin)
-
     t.draw()
+    //GL11.glColor4f(
+    //  light,
+    //  light,
+    //  light, 1.0F)
+    //t.startQuads()
+    //// Top edge – uses the top row of the texture (vMin..vTopRow)
+    //t.vertex(flagLeft,  flagTop, flagZBack,  uMax, vMin)
+    //t.vertex(flagLeft,  flagTop, flagZFront, uMax, vTopRow)
+    //t.vertex(flagRight, flagTop, flagZFront, uMin, vTopRow)
+    //t.vertex(flagRight, flagTop, flagZBack,  uMin, vMin)
+//
+    //t.draw()
+    //GL11.glColor4f(
+    //  yLight,
+    //  yLight,
+    //  yLight, 1.0F)
+    //t.startQuads()
+    //// Bottom edge – uses the bottom row of the texture (vBottomRow..vMax)
+    //t.vertex(flagLeft,  flagBottom, flagZFront, uMax, vBottomRow)
+    //t.vertex(flagLeft,  flagBottom, flagZBack,  uMax, vMax)
+    //t.vertex(flagRight, flagBottom, flagZBack,  uMin, vMax)
+    //t.vertex(flagRight, flagBottom, flagZFront, uMin, vBottomRow)
+//
+    //t.draw()
+    //GL11.glColor4f(
+    //  zLight,
+    //  zLight,
+    //  zLight, 1.0F)
+    //t.startQuads()
+    //// Right (free) edge – uses the rightmost column (uMax..uRightCol)
+    //t.vertex(flagLeft, flagTop,    flagZFront, uMax,      vMin)
+    //t.vertex(flagLeft, flagBottom, flagZFront, uMax,      vMax)
+    //t.vertex(flagLeft, flagBottom, flagZBack,  uRightCol, vMax)
+    //t.vertex(flagLeft, flagTop,    flagZBack,  uRightCol, vMin)
+    //
+    //t.draw()
   }
 
   private fun getOrCreateTexture(entity: FlagBlockEntity): Int {

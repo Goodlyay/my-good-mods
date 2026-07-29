@@ -37,6 +37,7 @@ class FlagPoleBlock : TemplateBlock(namespace.id("flagpole"), Material.WOOD) {
     return GoodFlags.flagBlock.onUse(world, x, baseY, z, player)
   }
 
+  //ztodo: Edit this to be painting-like logic? This entire block might be unnessesally though
   override fun neighborUpdate(world: World, x: Int, y: Int, z: Int, id: Int) {
     val flagId = GoodFlags.flagBlock.id
     val poleId = this.id

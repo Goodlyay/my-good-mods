@@ -64,6 +64,7 @@ class FlagBlock : TemplateBlockWithEntity(namespace.id("flag"), Material.WOOD), 
     return false
   }
 
+  //ztodo: edit placeable logic
   override fun canPlaceAt(world: World, x: Int, y: Int, z: Int) =
     y + 2 < 128
       && world.getMaterial(x, y - 1, z).suffocates()
