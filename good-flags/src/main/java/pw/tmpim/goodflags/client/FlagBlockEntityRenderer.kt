@@ -9,9 +9,11 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.render.Tessellator
 import net.minecraft.client.render.block.entity.BlockEntityRenderer
 import net.minecraft.client.render.platform.Lighting
+import net.minecraft.util.math.MathHelper
 import net.modificationstation.stationapi.api.client.StationRenderAPI
 import net.modificationstation.stationapi.api.client.texture.atlas.Atlases
 import org.lwjgl.opengl.GL11
+import org.lwjgl.util.vector.Vector3f
 import pw.tmpim.goodflags.block.FlagBlockEntity
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_HEIGHT
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_WIDTH
@@ -279,9 +281,14 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
         val dyeIndex = colorIndex and 0xF
         val woolTex = woolTextures[dyeIndex] ?: woolTextures[0] // fallback to white
 
-        // Map flag pixel to wool tile via modulo (tile repeats across the 48×32 flag canvas)
-        // TODO: scale the canvas according to the resolution of the resource pack (based on the biggest wool tex?)
-        buffer.putInt(woolTex.baseFrame.getColor(x % woolTex.width, y % woolTex.height))
+        val texturedWoolCol = unpackedColor(woolTex.baseFrame.getColor(x % woolTex.width, y % woolTex.height))
+        //Pick an average-ish color on the wool texture at 0,3
+        val plainWoolCol = unpackedColor(woolTex.baseFrame.getColor(0, 3))
+        lerp(texturedWoolCol, texturedWoolCol, plainWoolCol, 0.5f)
+
+        //multiplyVector(plainWoolCol, texturedWoolCol)
+
+        buffer.putInt(packedColor(texturedWoolCol))
       }
     }
     buffer.flip()
@@ -308,6 +315,33 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
 
     fun clearTextureCache() {
       textureCache.clear()
+    }
+
+    public fun unpackedColor(packed : Int) : Vector3f {
+      return Vector3f(
+        (packed and 0xFF) / 255.0f,
+        ((packed shr 8) and 0xFF) / 255.0f,
+        ((packed shr 16) and 0xFF) / 255.0f
+      )
+    }
+    public fun packedColor(color : Vector3f) : Int {
+      color.x = Math.clamp(color.x, 0.0f, 1.0f)
+      color.y = Math.clamp(color.y, 0.0f, 1.0f)
+      color.z = Math.clamp(color.z, 0.0f, 1.0f)
+
+      val r = (MathHelper.floor(color.x * 255.0f)) and 0xFF
+      val g = (MathHelper.floor(color.y * 255.0f)) and 0xFF
+      val b = (MathHelper.floor(color.z * 255.0f)) and 0xFF
+      return r or (g shl 8) or (b shl 16) or (0xFF shl 24)
+    }
+    public fun lerp(target : Vector3f, start : Vector3f, goal : Vector3f, t : Float) {
+      val xDiff = goal.x - start.x; val x = start.x + (xDiff * t);
+      val yDiff = goal.y - start.y; val y = start.y + (yDiff * t);
+      val zDiff = goal.z - start.z; val z = start.z + (zDiff * t);
+      target.x = x; target.y = y; target.z = z
+    }
+    public fun multiplyVector(a : Vector3f, b: Vector3f) {
+      a.x *= b.x; a.y *= b.y; a.z *= b.z
     }
   }
 }
