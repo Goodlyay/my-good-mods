@@ -38,7 +38,7 @@ data class PanelLayout(
     fun compute(screenWidth: Int, viewport: CanvasViewport): PanelLayout {
       val totalPaletteWidth = PALETTE_SIZE * (PALETTE_SWATCH_SIZE + PALETTE_GAP) - PALETTE_GAP
       val palX = (screenWidth - totalPaletteWidth) / 2
-      val palY = viewport.canvasY + viewport.canvasHeight + PALETTE_CANVAS_GAP
+      val palY = viewport.canvasY + (viewport.canvasHeight + 16) + PALETTE_CANVAS_GAP
 
       val tlX = viewport.canvasX - TOOL_BTN_W - PANEL_GAP
       val totalToolsH = PaintTool.entries.size * (TOOL_BTN_H + TOOL_BTN_GAP) - TOOL_BTN_GAP

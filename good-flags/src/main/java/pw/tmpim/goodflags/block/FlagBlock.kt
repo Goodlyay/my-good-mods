@@ -75,9 +75,6 @@ class FlagBlock : TemplateBlockWithEntity(namespace.id("flag"), Material.WOOD), 
   override fun onPlaced(world: World, x: Int, y: Int, z: Int, placer: LivingEntity) {
     val rotation = (MathHelper.floor((placer.yaw * 4.0F / 360.0F) + 0.5) and 3)
     world.setBlockMeta(x, y, z, rotation)
-
-    val var8 = 0.15f
-    this.setBoundingBox(0.0f, 0.2f, 0.5f - var8, var8 * 2.0f, 0.8f, 0.5f + var8)
     //val poleId = GoodFlags.flagPoleBlock.id
     //world.setBlock(x, y + 1, z, poleId)
     //world.setBlock(x, y + 2, z, poleId)
@@ -103,7 +100,6 @@ class FlagBlock : TemplateBlockWithEntity(namespace.id("flag"), Material.WOOD), 
         1.0f-thick, 0.0f, 0.0f,
         1.0f-half, 1.0f, 1.0f)
     } else {
-      thick = 0.1f
       this.setBoundingBox(
         0.0f, 0.0f, 0.0f,
         1.0f, 1.0f, 1.0f)

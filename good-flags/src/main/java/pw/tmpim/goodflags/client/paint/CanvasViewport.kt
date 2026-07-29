@@ -11,7 +11,7 @@ class CanvasViewport(
   private val pixelScale: Int = 4,
 ) {
   val canvasWidth = FLAG_WIDTH * pixelScale
-  val canvasHeight = FLAG_HEIGHT * pixelScale
+  val canvasHeight = (FLAG_HEIGHT) * pixelScale
 
   var canvasX = 0
     private set
