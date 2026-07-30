@@ -109,12 +109,12 @@ class FlagPaintScreen(private val flagEntity: FlagBlockEntity) : Screen() {
 
   override fun mouseClicked(mouseX: Int, mouseY: Int, button: Int) {
     super.mouseClicked(mouseX, mouseY, button)
-    if (button != 0) return
+    //if (button != 0) return
 
-    if (handleToolClick(mouseX, mouseY)) return
-    if (handleBrushClick(mouseX, mouseY)) return
-    if (handlePaletteClick(mouseX, mouseY)) return
-    handleCanvasClick(mouseX, mouseY)
+    if (button == 0 && handleToolClick(mouseX, mouseY)) return
+    if (button == 0 && handleBrushClick(mouseX, mouseY)) return
+    if (button == 0 && handlePaletteClick(mouseX, mouseY)) return
+    handleCanvasClick(mouseX, mouseY, button)
   }
 
   private fun handleToolClick(mouseX: Int, mouseY: Int): Boolean {
@@ -135,10 +135,14 @@ class FlagPaintScreen(private val flagEntity: FlagBlockEntity) : Screen() {
     return false
   }
 
-  private fun handleCanvasClick(mouseX: Int, mouseY: Int) {
+  private fun handleCanvasClick(mouseX: Int, mouseY: Int, button: Int) {
     if (!viewport.isInsideCanvas(mouseX, mouseY)) return
     val px = viewport.toPixelX(mouseX)
     val py = viewport.toPixelY(mouseY)
+    if (button != 0) {
+      selectedColor = canvas.getPixelColor(px, py)
+      return
+    }
     when {
       currentTool == PaintTool.FILL -> {
         canvas.pushUndo()
