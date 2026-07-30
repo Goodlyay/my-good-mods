@@ -34,6 +34,9 @@ object FlagSpec {
     0xEF86A4,
   )
 
-  fun getGLColor(dyeIndex: Int) =
-    (0xFF000000 or colors[dyeIndex]).toInt()
+  fun getGLColor(i: Int) =
+    (0xFF000000 or colors[if (i in 0..<FLAG_PALETTE_SIZE) i else FLAG_PALETTE_WHITE]).toInt()
+
+
+
 }
