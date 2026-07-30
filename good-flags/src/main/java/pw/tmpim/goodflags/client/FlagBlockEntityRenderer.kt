@@ -16,6 +16,8 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.util.vector.Vector3f
 import pw.tmpim.goodflags.block.FlagBlockEntity
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_HEIGHT
+import pw.tmpim.goodflags.block.FlagSpec.FLAG_PALETTE_SIZE
+import pw.tmpim.goodflags.block.FlagSpec.FLAG_PALETTE_WHITE
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_WIDTH
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -86,23 +88,28 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
     val flagZFront    = 0.5 - 0.03125
     val flagZBack     = flagZFront - flagThickness
 
-    val gameAtlas = StationRenderAPI.getBakedModelManager().getAtlas(Atlases.GAME_ATLAS_TEXTURE)
-    gameAtlas.bindTexture()
+    //val gameAtlas = StationRenderAPI.getBakedModelManager().getAtlas(Atlases.GAME_ATLAS_TEXTURE)
+    //gameAtlas.bindTexture()
+    this.bindTexture("/art/kz.png")
 
-    val atlas = Atlases.getTerrain()
-    val woodBlockSideId = Block.PLANKS.getTexture(2)
-    val woodBlockSideSprite = atlas.getTexture(woodBlockSideId)
+    //val atlas = Atlases.getTerrain()
+    //val woodBlockSideId = Block.STONE.getTexture(0)
+    //val woodBlockSideSprite = atlas.getTexture(woodBlockSideId)
+    val startU = 12.0 / 16.0
+    val endU   = 13.0 / 16.0
+    val startV = 0.0
+    val endV   = 1.0 / 16.0
 
-    val uSize = woodBlockSideSprite.endU - woodBlockSideSprite.startU
-    val vSize = woodBlockSideSprite.endV - woodBlockSideSprite.startV
-    val uSideStart = woodBlockSideSprite.startU
-    val uSideEnd   = woodBlockSideSprite.startU + uSize / 16
-    val vSideStart = woodBlockSideSprite.startV
-    val vSideEnd   = woodBlockSideSprite.endV
-    val uEndsStart = woodBlockSideSprite.startU
-    val uEndsEnd   = woodBlockSideSprite.startU + uSize / 16
-    val vEndsStart = woodBlockSideSprite.startV
-    val vEndsEnd   = woodBlockSideSprite.startV + vSize / 16
+    val uSize = endU - startU
+    val vSize = endV - startV
+    val uSideStart = startU
+    val uSideEnd   = startU + uSize / 16
+    val vSideStart = startV
+    val vSideEnd   = endV
+    val uEndsStart = startU
+    val uEndsEnd   = startU + uSize / 16
+    val vEndsStart = startV
+    val vEndsEnd   = startV + vSize / 16
 
     val yBottom = 0.0
     val yTop    = yBottom + 1.0
@@ -115,10 +122,10 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
     t.startQuads()
 
     // North face (negative Z)
-    t.vertex(flagLeft,  flagTop,    flagZFront, woodBlockSideSprite.startU, woodBlockSideSprite.startV) //top left
-    t.vertex(flagLeft,  flagBottom, flagZFront, woodBlockSideSprite.startU, woodBlockSideSprite.endV) //bottom left
-    t.vertex(flagRight, flagBottom, flagZFront, woodBlockSideSprite.endU,   woodBlockSideSprite.endV) //bottom right
-    t.vertex(flagRight, flagTop,    flagZFront, woodBlockSideSprite.endU,   woodBlockSideSprite.startV) //top right
+    t.vertex(flagLeft,  flagTop,    flagZFront, startU, startV) //top left
+    t.vertex(flagLeft,  flagBottom, flagZFront, startU, endV) //bottom left
+    t.vertex(flagRight, flagBottom, flagZFront, endU,   endV) //bottom right
+    t.vertex(flagRight, flagTop,    flagZFront, endU,   startV) //top right
     t.draw()
     GL11.glColor4f(
       zLight,
@@ -143,10 +150,10 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
       light, 1.0F)
     t.startQuads()
     // Top face
-    t.vertex(flagLeft,  flagTop, flagZBack,  woodBlockSideSprite.startU, woodBlockSideSprite.startV) //top left
-    t.vertex(flagLeft,  flagTop, flagZFront, woodBlockSideSprite.startU, woodBlockSideSprite.startV + vSize / 16) //bottom left
-    t.vertex(flagRight, flagTop, flagZFront, woodBlockSideSprite.endU,   woodBlockSideSprite.startV + vSize / 16) //bottom right
-    t.vertex(flagRight, flagTop, flagZBack,  woodBlockSideSprite.endU,   woodBlockSideSprite.startV) //top right
+    t.vertex(flagLeft,  flagTop, flagZBack,  startU, startV) //top left
+    t.vertex(flagLeft,  flagTop, flagZFront, startU, startV + vSize / 16) //bottom left
+    t.vertex(flagRight, flagTop, flagZFront, endU,   startV + vSize / 16) //bottom right
+    t.vertex(flagRight, flagTop, flagZBack,  endU,   startV) //top right
 
     t.draw()
     GL11.glColor4f(
@@ -155,10 +162,10 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
       yLight, 1.0F)
     t.startQuads()
     // 🥺
-    t.vertex(flagLeft,  flagBottom, flagZFront, woodBlockSideSprite.startU, woodBlockSideSprite.startV) //top left
-    t.vertex(flagLeft,  flagBottom, flagZBack,  woodBlockSideSprite.startU, woodBlockSideSprite.startV + vSize / 16) //bottom left
-    t.vertex(flagRight, flagBottom, flagZBack,  woodBlockSideSprite.endU,   woodBlockSideSprite.startV + vSize / 16) //bottom right
-    t.vertex(flagRight, flagBottom, flagZFront, woodBlockSideSprite.endU,   woodBlockSideSprite.startV) //top right
+    t.vertex(flagLeft,  flagBottom, flagZFront, startU, startV) //top left
+    t.vertex(flagLeft,  flagBottom, flagZBack,  startU, startV + vSize / 16) //bottom left
+    t.vertex(flagRight, flagBottom, flagZBack,  endU,   startV + vSize / 16) //bottom right
+    t.vertex(flagRight, flagBottom, flagZFront, endU,   startV) //top right
 
     t.draw()
   }
@@ -279,7 +286,8 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
     for (y in 0 until FLAG_HEIGHT) {
       for (x in 0 until FLAG_WIDTH) {
         val colorIndex = entity.getPixel(x, y)
-        val dyeIndex = colorIndex and 0xFF
+        var dyeIndex = colorIndex and 0xFF
+        if (dyeIndex >= FLAG_PALETTE_SIZE) dyeIndex = FLAG_PALETTE_WHITE
 
         //15 is white wool
         val texturedWoolCol = unpackedColor(
@@ -325,14 +333,14 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
       textureCache.clear()
     }
 
-    public fun unpackedColor(packed : Int) : Vector3f {
+    fun unpackedColor(packed : Int) : Vector3f {
       return Vector3f(
         (packed and 0xFF) / 255.0f,
         ((packed shr 8) and 0xFF) / 255.0f,
         ((packed shr 16) and 0xFF) / 255.0f
       )
     }
-    public fun packedColor(color : Vector3f) : Int {
+    fun packedColor(color : Vector3f) : Int {
       color.x = Math.clamp(color.x, 0.0f, 1.0f)
       color.y = Math.clamp(color.y, 0.0f, 1.0f)
       color.z = Math.clamp(color.z, 0.0f, 1.0f)
@@ -342,13 +350,13 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
       val b = (MathHelper.floor(color.z * 255.0f)) and 0xFF
       return r or (g shl 8) or (b shl 16) or (0xFF shl 24)
     }
-    public fun lerp(target : Vector3f, start : Vector3f, goal : Vector3f, t : Float) {
+    fun lerp(target : Vector3f, start : Vector3f, goal : Vector3f, t : Float) {
       val xDiff = goal.x - start.x; val x = start.x + (xDiff * t);
       val yDiff = goal.y - start.y; val y = start.y + (yDiff * t);
       val zDiff = goal.z - start.z; val z = start.z + (zDiff * t);
       target.x = x; target.y = y; target.z = z
     }
-    public fun multiplyVector(a : Vector3f, b: Vector3f) {
+    fun multiplyVector(a : Vector3f, b: Vector3f) {
       a.x *= b.x; a.y *= b.y; a.z *= b.z
     }
   }

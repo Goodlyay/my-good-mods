@@ -10,6 +10,7 @@ import org.lwjgl.input.Mouse
 import pw.tmpim.goodflags.GoodFlags.MOD_ID
 import pw.tmpim.goodflags.block.FlagBlockEntity
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_HEIGHT
+import pw.tmpim.goodflags.block.FlagSpec.FLAG_PALETTE_SIZE
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_WIDTH
 import pw.tmpim.goodflags.block.FlagSpec.getGLColor
 import pw.tmpim.goodflags.client.paint.*
@@ -22,7 +23,6 @@ import pw.tmpim.goodflags.client.paint.PanelLayout.Companion.MAX_BRUSH_SIZE
 import pw.tmpim.goodflags.client.paint.PanelLayout.Companion.PALETTE_BUTTON_GAP
 import pw.tmpim.goodflags.client.paint.PanelLayout.Companion.PALETTE_CANVAS_GAP
 import pw.tmpim.goodflags.client.paint.PanelLayout.Companion.PALETTE_GAP
-import pw.tmpim.goodflags.client.paint.PanelLayout.Companion.PALETTE_SIZE
 import pw.tmpim.goodflags.client.paint.PanelLayout.Companion.PALETTE_SWATCH_SIZE
 import pw.tmpim.goodflags.client.paint.PanelLayout.Companion.TOOL_BTN_GAP
 import pw.tmpim.goodflags.client.paint.PanelLayout.Companion.TOOL_BTN_H
@@ -130,7 +130,7 @@ class FlagPaintScreen(private val flagEntity: FlagBlockEntity) : Screen() {
   }
 
   private fun handlePaletteClick(mouseX: Int, mouseY: Int): Boolean {
-    val idx = HitTest.horizontal(mouseX, mouseY, layout.paletteX, layout.paletteY, PALETTE_SWATCH_SIZE, PALETTE_SWATCH_SIZE, PALETTE_GAP, PALETTE_SIZE)
+    val idx = HitTest.horizontal(mouseX, mouseY, layout.paletteX, layout.paletteY, PALETTE_SWATCH_SIZE, PALETTE_SWATCH_SIZE, PALETTE_GAP, FLAG_PALETTE_SIZE)
     if (idx >= 0) { selectedColor = idx; return true }
     return false
   }
@@ -305,7 +305,7 @@ class FlagPaintScreen(private val flagEntity: FlagBlockEntity) : Screen() {
   private fun drawPalette() {
     fun swatchX(i: Int) = layout.paletteX + i * (PALETTE_SWATCH_SIZE + PALETTE_GAP)
 
-    for (i in 0 until PALETTE_SIZE) {
+    for (i in 0 until FLAG_PALETTE_SIZE) {
       if (i == selectedColor) continue
       val sx = swatchX(i)
       fill(sx - 1, layout.paletteY - 1, sx + PALETTE_SWATCH_SIZE + 1, layout.paletteY + PALETTE_SWATCH_SIZE + 1, PaintColors.PALETTE_BORDER)

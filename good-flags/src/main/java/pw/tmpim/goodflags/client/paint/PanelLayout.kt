@@ -1,5 +1,7 @@
 package pw.tmpim.goodflags.client.paint
 
+import pw.tmpim.goodflags.block.FlagSpec.FLAG_PALETTE_SIZE
+
 /**
  * Computed positions for the UI panels surrounding the canvas.
  * Recalculated whenever the screen is resized.
@@ -14,7 +16,6 @@ data class PanelLayout(
 ) {
   companion object {
     // ── Size/spacing constants ────────────────────────────────────────────
-    const val PALETTE_SIZE = 24
     const val MAX_BRUSH_SIZE = 4
     const val PALETTE_CANVAS_GAP = 15
     const val PANEL_GAP = 18
@@ -36,7 +37,7 @@ data class PanelLayout(
      * Compute the panel layout from the screen dimensions and canvas viewport.
      */
     fun compute(screenWidth: Int, viewport: CanvasViewport): PanelLayout {
-      val totalPaletteWidth = PALETTE_SIZE * (PALETTE_SWATCH_SIZE + PALETTE_GAP) - PALETTE_GAP
+      val totalPaletteWidth = FLAG_PALETTE_SIZE * (PALETTE_SWATCH_SIZE + PALETTE_GAP) - PALETTE_GAP
       val palX = (screenWidth - totalPaletteWidth) / 2
       val palY = viewport.canvasY + (viewport.canvasHeight + 16) + PALETTE_CANVAS_GAP
 

@@ -5,19 +5,21 @@ import net.fabricmc.api.Environment
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.nbt.NbtCompound
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_HEIGHT
+import pw.tmpim.goodflags.block.FlagSpec.FLAG_PALETTE_WHITE
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_WIDTH
 import pw.tmpim.goodflags.net.FlagNetworkingS2C
 
 class FlagBlockEntity : BlockEntity() {
-  /** Each byte is a color index 0-15. Row-major order: index = y * WIDTH + x */
-  val pixels = ByteArray(FLAG_WIDTH * FLAG_HEIGHT).apply { fill(15) }
+  /** Each byte is a color index 0-23. Row-major order: index = y * WIDTH + x */
+  /** 16 is white palette  */
+  val pixels = ByteArray(FLAG_WIDTH * FLAG_HEIGHT).apply { fill(FLAG_PALETTE_WHITE.toByte()) }
 
   /** Tracks whether the texture needs regenerating on the client. */
   @Transient
   var dirty = true
 
-  /** True if any pixel differs from the default white (index 15). */
-  val isPainted: Boolean get() = pixels.any { it != 15.toByte() }
+  /** True if any pixel differs from the default white. */
+  val isPainted: Boolean get() = pixels.any { it != FLAG_PALETTE_WHITE.toByte() }
 
   fun getPixel(x: Int, y: Int): Int {
     if (x !in 0..<FLAG_WIDTH || y !in 0..<FLAG_HEIGHT) return 0

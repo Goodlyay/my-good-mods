@@ -7,6 +7,7 @@ import pw.tmpim.goodflags.GoodFlags.log
 import pw.tmpim.goodflags.GoodFlags.namespace
 import pw.tmpim.goodflags.block.FlagBlockEntity
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_HEIGHT
+import pw.tmpim.goodflags.block.FlagSpec.FLAG_PALETTE_SIZE
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_WIDTH
 import pw.tmpim.goodutils.net.GlassPacket
 
@@ -57,7 +58,7 @@ object FlagNetworkingC2S {
 
     // Validate all bytes are valid color indices
     for (b in bytes) {
-      if (b.toInt() and 0xFF > 15) return
+      if (b.toInt() and 0xFF >= FLAG_PALETTE_SIZE) return
     }
 
     // Update the underlying block entity
