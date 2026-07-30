@@ -6,7 +6,7 @@ object FlagSpec {
 
   const val FLAG_PALETTE_SIZE = 24;
   const val FLAG_PALETTE_WHITE = 16;
-  // Can't use DyeItem.colors because light gray is wrong in there lmao
+
   val colors = longArrayOf(
     0x3D2F35,
     0x77152E,

@@ -21,6 +21,8 @@ import net.modificationstation.stationapi.api.item.StationItemNbt
 import org.lwjgl.opengl.GL11
 import pw.tmpim.goodflags.GoodFlags
 import pw.tmpim.goodflags.block.FlagSpec
+import pw.tmpim.goodflags.block.FlagSpec.FLAG_PALETTE_SIZE
+import pw.tmpim.goodflags.client.FlagBlockEntityRenderer.Companion.getTexturedFlagPixel
 
 /**
  * Custom BlockItem for the flag block that renders a downsampled preview of
@@ -87,16 +89,16 @@ class FlagBlockItem(id: Int) : BlockItem(id), ItemWithRenderer {
     for (py in 0 until previewH) {
       for (px in 0 until previewW) {
         // Source region bounds (integer division maps preview pixels to source regions)
-        val srcX0 = px * FlagSpec.FLAG_WIDTH / previewW
+        val srcX0 = px       * FlagSpec.FLAG_WIDTH / previewW
         val srcX1 = (px + 1) * FlagSpec.FLAG_WIDTH / previewW
-        val srcY0 = py * FlagSpec.FLAG_HEIGHT / previewH
+        val srcY0 = py       * FlagSpec.FLAG_HEIGHT / previewH
         val srcY1 = (py + 1) * FlagSpec.FLAG_HEIGHT / previewH
 
         // Count occurrences of each color index in this region
-        val counts = IntArray(16)
+        val counts = IntArray(FLAG_PALETTE_SIZE)
         for (sy in srcY0 until srcY1) {
           for (sx in srcX0 until srcX1) {
-            val colorIndex = pixels[sy * FlagSpec.FLAG_WIDTH + sx].toInt() and 0xF
+            val colorIndex = pixels[sy * FlagSpec.FLAG_WIDTH + sx].toInt() and 0xFF
             counts[colorIndex]++
           }
         }
@@ -104,7 +106,7 @@ class FlagBlockItem(id: Int) : BlockItem(id), ItemWithRenderer {
         // Find the mode (most common color)
         var bestIndex = 0
         var bestCount = counts[0]
-        for (i in 0..<16) {
+        for (i in 0..<FLAG_PALETTE_SIZE) {
           if (counts[i] > bestCount) {
             bestCount = counts[i]
             bestIndex = i
@@ -124,20 +126,15 @@ class FlagBlockItem(id: Int) : BlockItem(id), ItemWithRenderer {
 
     for (py in 0 until previewH) {
       for (px in 0 until previewW) {
-        val dyeIndex = previewColors[py * previewW + px] and 0xF
-        val woolTex = woolTextures[dyeIndex] ?: woolTextures[0] // fallback to white
-        val color = woolTex.baseFrame.getColor(px % woolTex.width, py % woolTex.height)
-
-        val b = ((color shr 16) and 0xFF) / 255.0f
-        val g = ((color shr 8) and 0xFF) / 255.0f
-        val r = (color and 0xFF) / 255.0f
+        val colorIndex = previewColors[py * previewW + px]
+        val col = getTexturedFlagPixel(colorIndex,px, py, woolTextures[15])
 
         val x1 = x + (flagOffsetX + px) * scale
         val y1 = y + (flagOffsetY + py) * scale
         val x2 = x1 + scale
         val y2 = y1 + scale
 
-        GL11.glColor4f(r, g, b, 1.0f)
+        GL11.glColor4f(col.x, col.y, col.z, 1.0f)
         t.startQuads()
         t.vertex(x1, y2, 0.0)
         t.vertex(x2, y2, 0.0)

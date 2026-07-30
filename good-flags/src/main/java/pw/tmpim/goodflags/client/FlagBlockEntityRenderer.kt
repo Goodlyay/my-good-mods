@@ -10,7 +10,7 @@ import net.minecraft.client.render.Tessellator
 import net.minecraft.client.render.block.entity.BlockEntityRenderer
 import net.minecraft.client.render.platform.Lighting
 import net.minecraft.util.math.MathHelper
-import net.modificationstation.stationapi.api.client.StationRenderAPI
+import net.modificationstation.stationapi.api.client.texture.SpriteContents
 import net.modificationstation.stationapi.api.client.texture.atlas.Atlases
 import org.lwjgl.opengl.GL11
 import org.lwjgl.util.vector.Vector3f
@@ -286,25 +286,7 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
     for (y in 0 until FLAG_HEIGHT) {
       for (x in 0 until FLAG_WIDTH) {
         val colorIndex = entity.getPixel(x, y)
-        var dyeIndex = colorIndex and 0xFF
-        if (dyeIndex >= FLAG_PALETTE_SIZE) dyeIndex = FLAG_PALETTE_WHITE
-
-        //15 is white wool
-        val texturedWoolCol = unpackedColor(
-          woolTextures[15].baseFrame.getColor(x % woolTextures[15].width, y % woolTextures[15].height)
-        )
-        //Lower contrast of wool tex
-        lerp(texturedWoolCol,texturedWoolCol, Vector3f(1f, 1f, 1f), 0.5f)
-
-        val tint = unpackedColor(getGLColor((dyeIndex)))
-        //This buffer seems to expect BBGGRR whereas our palette colors are defined using RRGGBB...
-        val temp = tint.x;
-        tint.x = tint.z;
-        tint.z = temp;
-        //Tint wool tex by palette color
-        multiplyVector(texturedWoolCol, tint)
-
-        buffer.putInt(packedColor(texturedWoolCol))
+        buffer.putInt(packedColor(getTexturedFlagPixel(colorIndex, x, y, woolTextures[15])))
       }
     }
     buffer.flip()
@@ -333,6 +315,23 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
       textureCache.clear()
     }
 
+    inline fun getTexturedFlagPixel(colorIndex : Int, texX : Int, texY : Int, woolTex : SpriteContents) : Vector3f {
+      //15 is white wool
+      val texturedWoolCol = unpackedColor(woolTex.baseFrame.getColor(texX % woolTex.width, texY % woolTex.height))
+      //Lower contrast of wool tex
+      lerp(texturedWoolCol,texturedWoolCol, Vector3f(1f, 1f, 1f), 0.5f)
+
+      var dyeIndex = colorIndex and 0xFF
+      if (dyeIndex >= FLAG_PALETTE_SIZE) dyeIndex = FLAG_PALETTE_WHITE
+      val tint = unpackedColor(getGLColor((dyeIndex)))
+      //Packed texture color is BBGGRR whereas our palette colors are defined using RRGGBB...
+      val temp = tint.x
+      tint.x = tint.z
+      tint.z = temp
+      //Tint wool tex by palette color
+      multiplyVector(texturedWoolCol, tint)
+      return texturedWoolCol
+    }
     fun unpackedColor(packed : Int) : Vector3f {
       return Vector3f(
         (packed and 0xFF) / 255.0f,
