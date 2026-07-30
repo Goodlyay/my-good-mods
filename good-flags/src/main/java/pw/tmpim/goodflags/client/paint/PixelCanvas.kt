@@ -11,8 +11,8 @@ import pw.tmpim.goodflags.block.FlagSpec.FLAG_WIDTH
  */
 class PixelCanvas(sourcePixels: ByteArray) {
   companion object {
-    private const val COLOR_MASK = 0xF
-    const val ERASER_COLOR = 15
+    private const val COLOR_MASK = 0xFF
+    const val ERASER_COLOR = 16
     private const val MAX_UNDO = 32
 
     fun packCoords(x: Int, y: Int): Long =

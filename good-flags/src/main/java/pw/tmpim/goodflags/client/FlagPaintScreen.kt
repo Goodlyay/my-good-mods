@@ -317,7 +317,9 @@ class FlagPaintScreen(private val flagEntity: FlagBlockEntity) : Screen() {
     fill(sx - 1, layout.paletteY - 1, sx + PALETTE_SWATCH_SIZE + 1, layout.paletteY + PALETTE_SWATCH_SIZE + 1, PaintColors.PALETTE_BORDER)
     fill(sx, layout.paletteY, sx + PALETTE_SWATCH_SIZE, layout.paletteY + PALETTE_SWATCH_SIZE, getGLColor(selectedColor))
 
-    val colorName = "${TranslationString.COLOR}.${DyeItem.names[selectedColor]}".i18n()
+    //TODO fix?
+    //val colorName = "${TranslationString.COLOR}.${DyeItem.names[selectedColor]}".i18n()
+    val colorName = "Palette"
     drawCenteredTextWithShadow(tr, colorName, width / 2, layout.paletteY - LABEL_OFFSET_Y, PaintColors.LABEL)
   }
 

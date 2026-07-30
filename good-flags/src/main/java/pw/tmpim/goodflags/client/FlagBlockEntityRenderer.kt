@@ -19,6 +19,7 @@ import pw.tmpim.goodflags.block.FlagSpec.FLAG_HEIGHT
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_WIDTH
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import pw.tmpim.goodflags.block.FlagSpec.getGLColor
 
 @Environment(EnvType.CLIENT)
 class FlagBlockEntityRenderer : BlockEntityRenderer() {
@@ -278,15 +279,22 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
     for (y in 0 until FLAG_HEIGHT) {
       for (x in 0 until FLAG_WIDTH) {
         val colorIndex = entity.getPixel(x, y)
-        val dyeIndex = colorIndex and 0xF
-        val woolTex = woolTextures[dyeIndex] ?: woolTextures[0] // fallback to white
+        val dyeIndex = colorIndex and 0xFF
 
-        val texturedWoolCol = unpackedColor(woolTex.baseFrame.getColor(x % woolTex.width, y % woolTex.height))
-        //Pick an average-ish color on the wool texture at 0,3
-        val plainWoolCol = unpackedColor(woolTex.baseFrame.getColor(0, 3))
-        lerp(texturedWoolCol, texturedWoolCol, plainWoolCol, 0.5f)
+        //15 is white wool
+        val texturedWoolCol = unpackedColor(
+          woolTextures[15].baseFrame.getColor(x % woolTextures[15].width, y % woolTextures[15].height)
+        )
+        //Lower contrast of wool tex
+        lerp(texturedWoolCol,texturedWoolCol, Vector3f(1f, 1f, 1f), 0.5f)
 
-        //multiplyVector(plainWoolCol, texturedWoolCol)
+        val tint = unpackedColor(getGLColor((dyeIndex)))
+        //This buffer seems to expect BBGGRR whereas our palette colors are defined using RRGGBB...
+        val temp = tint.x;
+        tint.x = tint.z;
+        tint.z = temp;
+        //Tint wool tex by palette color
+        multiplyVector(texturedWoolCol, tint)
 
         buffer.putInt(packedColor(texturedWoolCol))
       }

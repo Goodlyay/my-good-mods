@@ -14,7 +14,7 @@ data class PanelLayout(
 ) {
   companion object {
     // ── Size/spacing constants ────────────────────────────────────────────
-    const val PALETTE_SIZE = 16
+    const val PALETTE_SIZE = 24
     const val MAX_BRUSH_SIZE = 4
     const val PALETTE_CANVAS_GAP = 15
     const val PANEL_GAP = 18
