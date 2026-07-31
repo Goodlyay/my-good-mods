@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:dye"
+    },
+    {
+      "item": "minecraft:dye",
+      "damage": 1
+    },
+    {
+      "item": "minecraft:dye",
+      "damage": 2
+    },
+    {
+      "item": "minecraft:dye",
+      "damage": 4
+    },
+    {
+      "item": "minecraft:dye",
+      "damage": 15
+    },
+    {
+      "item": "minecraft:oak_pressure_plate"
+    }
+  ],
+  "result": {
+    "item": "good-flags:palette"
+  }
+}

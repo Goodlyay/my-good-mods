@@ -4,6 +4,7 @@ import net.glasslauncher.mods.networking.GlassPacket
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.ClientNetworkHandler
 import pw.tmpim.goodflags.GoodFlags.namespace
+import pw.tmpim.goodflags.GoodFlags.paletteItem
 import pw.tmpim.goodflags.block.FlagBlockEntity
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_HEIGHT
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_WIDTH
@@ -63,10 +64,15 @@ object FlagNetworkingS2C {
 
     val player = minecraft.player;
 
-    player.sendMessage("\u00a77[Accessing canvas by: ${entity.artist}]")
+    //player.sendMessage("\u00a77[Accessing canvas by: ${entity.artist}]")
 
     if (entity.isPainted && entity.artist.length > 0 && entity.artist != player.name) {
       player.sendMessage("\u00a77[Painted by ${entity.artist}]")
+      return
+    }
+    val heldStack = player.hand;
+    if (heldStack == null || heldStack.item  != paletteItem) {
+      player.sendMessage("You can only paint while holding a palette")
       return
     }
     entity.artist = player.name

@@ -26,7 +26,7 @@ gui.good-flags.config.item_renderer_enabled=Show canvas preview on item
 gui.good-flags.config.item_renderer_enabled.desc=Draw the canvas's painted design on top of the canvas item icon in inventory slots
 gui.good-flags.config.item_texture_resolution=Item texture base resolution
 gui.good-flags.config.item_texture_resolution.desc=Base resolution of the item icon in pixels (default 16 for standard textures; increase for higher-resolution texture packs)
-gui.good-flags.config.name=Goodly Paintings
+gui.good-flags.config.name=Good Flags
 gui.good-flags.title=Paint Canvas
 gui.good-flags.tool.brush=Brush
 gui.good-flags.tool.circle=Circle
@@ -36,6 +36,7 @@ gui.good-flags.tool.line=Line
 gui.good-flags.tool.pencil=Pencil
 gui.good-flags.tool.rect=Rect
 gui.good-flags.tool.title=Tools
-tile.good-flags.flag.name=Paint Canvas
+item.good-flags.palette.name=Palette
+tile.good-flags.flag.name=Canvas
 tile.good-flags.flagpole.name=Flag Pole
 

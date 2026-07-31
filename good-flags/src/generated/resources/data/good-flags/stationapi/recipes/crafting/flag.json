@@ -3,15 +3,18 @@
   "pattern": [
     "LLL",
     "LWL",
-    "LLL"
+    "LPL"
   ],
   "key": {
-    "L": {
-      "item": "minecraft:leather"
+    "P": {
+      "item": "good-flags:palette"
     },
     "W": {
       "item": "minecraft:wool",
       "damage": -1
+    },
+    "L": {
+      "item": "minecraft:leather"
     }
   },
   "result": {
