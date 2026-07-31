@@ -15,6 +15,9 @@ object FlagSpec {
   const val PREVIEW_DEFAULT_WIDTH = 14
   const val PREVIEW_DEFAULT_HEIGHT = 12
 
+  const val NBT_PIXELS = "Pixels"
+  const val NBT_ARTIST = "Artist"
+
   val colors = longArrayOf(
     0x3D2F35,
     0x77152E,

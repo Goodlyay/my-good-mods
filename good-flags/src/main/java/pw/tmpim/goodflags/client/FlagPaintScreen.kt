@@ -87,9 +87,10 @@ class FlagPaintScreen(private val flagEntity: FlagBlockEntity) : Screen() {
   }
 
   private fun submitCanvas() {
+
     System.arraycopy(canvas.pixels, 0, flagEntity.pixels, 0, canvas.pixels.size)
     flagEntity.dirty = true
-    FlagNetworkingC2S.createFlagUpdatePacket(flagEntity.x, flagEntity.y, flagEntity.z, canvas.pixels)
+    FlagNetworkingC2S.createFlagUpdatePacket(flagEntity.x, flagEntity.y, flagEntity.z, canvas.pixels, flagEntity.artist)
       .sendToServer()
   }
 

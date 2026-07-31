@@ -9,6 +9,8 @@ import pw.tmpim.goodflags.block.FlagBlockEntity
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_HEIGHT
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_PALETTE_SIZE
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_WIDTH
+import pw.tmpim.goodflags.block.FlagSpec.NBT_ARTIST
+import pw.tmpim.goodflags.block.FlagSpec.NBT_PIXELS
 import pw.tmpim.goodutils.net.GlassPacket
 
 object FlagNetworkingC2S {
@@ -18,12 +20,13 @@ object FlagNetworkingC2S {
   /**
    * Send flag pixel data from the client to the server.
    */
-  fun createFlagUpdatePacket(x: Int, y: Int, z: Int, pixels: ByteArray) =
+  fun createFlagUpdatePacket(x: Int, y: Int, z: Int, pixels: ByteArray, artist : String) =
     GlassPacket(FLAG_UPDATE_ID) {
       putInt("x", x)
       putInt("y", y)
       putInt("z", z)
-      putByteArray("pixels", pixels.copyOf())
+      putByteArray(NBT_PIXELS, pixels.copyOf())
+      putString(NBT_ARTIST, artist)
     }
 
   /**
@@ -36,7 +39,8 @@ object FlagNetworkingC2S {
     val x = nbt.getInt("x")
     val y = nbt.getInt("y")
     val z = nbt.getInt("z")
-    val bytes = nbt.getByteArray("pixels")
+    val bytes = nbt.getByteArray(NBT_PIXELS)
+    val artist = nbt.getString(NBT_ARTIST)
 
     if (bytes.size != FLAG_WIDTH * FLAG_HEIGHT) return
 
@@ -45,14 +49,14 @@ object FlagNetworkingC2S {
     val dy = player.y - (y + 0.5)
     val dz = player.z - (z + 0.5)
     if (dx * dx + dy * dy + dz * dz > 64.0) {
-      log.warn("Player ${player.name} tried to edit a flag too far away")
+      log.warn("Player ${player.name} tried to edit a painting too far away")
       return
     }
 
     val world = player.world ?: return
     val entity = world.getBlockEntity(x, y, z)
     if (entity !is FlagBlockEntity) {
-      log.warn("Player ${player.name} tried to edit a non-flag block entity at $x, $y, $z")
+      log.warn("Player ${player.name} tried to edit a non-painting block entity at $x, $y, $z")
       return
     }
 
@@ -62,6 +66,6 @@ object FlagNetworkingC2S {
     }
 
     // Update the underlying block entity
-    entity.setAllPixels(bytes)
+    entity.setData(artist, bytes)
   }
 }
