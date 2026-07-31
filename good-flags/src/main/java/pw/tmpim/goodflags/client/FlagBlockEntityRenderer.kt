@@ -18,6 +18,8 @@ import pw.tmpim.goodflags.block.FlagBlockEntity
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_HEIGHT
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_PALETTE_SIZE
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_PALETTE_WHITE
+import pw.tmpim.goodflags.block.FlagSpec.FLAG_THICKNESS
+import pw.tmpim.goodflags.block.FlagSpec.FLAG_WALL_FLOAT
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_WIDTH
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -84,8 +86,8 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
     val flagBottom = flagTop - flagHeight
     val flagRight  = 0.5
     val flagLeft   = flagRight - flagWidth
-    val flagThickness = 0.0625
-    val flagZFront    = 0.5 - 0.03125
+    val flagThickness = FLAG_THICKNESS
+    val flagZFront    = 0.5 - FLAG_WALL_FLOAT
     val flagZBack     = flagZFront - flagThickness
 
     //val gameAtlas = StationRenderAPI.getBakedModelManager().getAtlas(Atlases.GAME_ATLAS_TEXTURE)
@@ -178,8 +180,8 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
     val flagBottom = flagTop - flagHeight
     val flagRight  = 0.5
     val flagLeft   = flagRight - flagWidth
-    val flagThickness = 0.0625
-    val flagZFront    = 0.5 - 0.03125
+    val flagThickness = FLAG_THICKNESS
+    val flagZFront    = 0.5 - FLAG_WALL_FLOAT
     val flagZBack     = flagZFront - flagThickness
 
     // UV edge fractions for the edge strips

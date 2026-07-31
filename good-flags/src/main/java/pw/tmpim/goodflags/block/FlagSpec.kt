@@ -6,6 +6,8 @@ object FlagSpec {
 
   const val FLAG_PALETTE_SIZE = 24;
   const val FLAG_PALETTE_WHITE = 16;
+  const val FLAG_THICKNESS = 0.0625
+  const val FLAG_WALL_FLOAT = 0.03125
 
   val colors = longArrayOf(
     0x3D2F35,
@@ -36,7 +38,5 @@ object FlagSpec {
 
   fun getGLColor(i: Int) =
     (0xFF000000 or colors[if (i in 0..<FLAG_PALETTE_SIZE) i else FLAG_PALETTE_WHITE]).toInt()
-
-
 
 }

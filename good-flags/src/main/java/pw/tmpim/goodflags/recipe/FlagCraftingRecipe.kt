@@ -49,7 +49,7 @@ object FlagCraftingRecipe : CraftingRecipe {
     if (otherCount > 0) return false
 
     // Copy: exactly one blank + exactly one painted
-    if (blankCount == 1 && paintedCount == 1) return true
+    //if (blankCount == 1 && paintedCount == 1) return true //No copies... WORK for your counterfeit paintings!!
 
     // Clear: exactly one painted flag, nothing else
     if (blankCount == 0 && paintedCount == 1) return true
@@ -75,12 +75,12 @@ object FlagCraftingRecipe : CraftingRecipe {
 
     return when {
       // Copy: return a new painted flag with the same pixels
-      blankCount == 1 && paintedCount == 1 -> {
-        val out = ItemStack(GoodFlags.flagBlock)
-        val srcPixels = source.pixelBytes()
-        if (srcPixels != null) out.stationNbt.putByteArray("Pixels", srcPixels)
-        out
-      }
+      //blankCount == 1 && paintedCount == 1 -> {
+      //  val out = ItemStack(GoodFlags.flagBlock)
+      //  val srcPixels = source.pixelBytes()
+      //  if (srcPixels != null) out.stationNbt.putByteArray("Pixels", srcPixels)
+      //  out
+      //}
       // Clear: return a blank flag
       blankCount == 0 && paintedCount == 1 -> ItemStack(GoodFlags.flagBlock)
       else -> null
@@ -112,18 +112,19 @@ object FlagCraftingRecipe : CraftingRecipe {
       }
     }
 
-    if (blankCount == 1 && paintedCount == 1) {
-      // Copy recipe: consume the blank flag, leave the painted flag in place.
-      for (i in 0..<input.size()) {
-        val s: ItemStack? = input.getStack(i)
-        if (s?.isFlagItem() == true && !s.isPainted()) {
-          input.removeStack(i, 1)
-          break
-        }
-      }
-      // Painted flag stays in its slot — do NOT remove it.
-      ci.cancel()
-    } else if (blankCount == 0 && paintedCount == 1) {
+    //if (blankCount == 1 && paintedCount == 1) {
+    //  // Copy recipe: consume the blank flag, leave the painted flag in place.
+    //  for (i in 0..<input.size()) {
+    //    val s: ItemStack? = input.getStack(i)
+    //    if (s?.isFlagItem() == true && !s.isPainted()) {
+    //      input.removeStack(i, 1)
+    //      break
+    //    }
+    //  }
+    //  // Painted flag stays in its slot — do NOT remove it.
+    //  ci.cancel()
+    //} else
+    if (blankCount == 0 && paintedCount == 1) {
       // Clear recipe: consume the painted flag normally.
       if (paintedSlot >= 0) input.removeStack(paintedSlot, 1)
       ci.cancel()
