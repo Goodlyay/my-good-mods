@@ -3,14 +3,14 @@
   "id": "good-flags",
   "version": "${version}",
 
-  "name": "Good Flags",
-  "description": "Placeable flags that you can paint on.",
+  "name": "Goodly Custom Paintings",
+  "description": "Placeable canvases that you can paint on. Based on Good Flags mod.",
   "authors": [
     "tmpim",
     "emmachase"
   ],
   "contact": {
-    "sources": "https://github.com/tmpim/my-good-mods"
+    "sources": "https://github.com/Goodlyay/my-good-mods"
   },
 
   "license": "MIT",

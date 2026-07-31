@@ -1,13 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "SWW",
-    "SWW",
-    "S  "
+    "LLL",
+    "LWL",
+    "LLL"
   ],
   "key": {
-    "S": {
-      "item": "minecraft:stick"
+    "L": {
+      "item": "minecraft:leather"
     },
     "W": {
       "item": "minecraft:wool",

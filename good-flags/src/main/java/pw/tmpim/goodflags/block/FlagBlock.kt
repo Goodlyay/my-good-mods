@@ -26,7 +26,7 @@ class FlagBlock : TemplateBlockWithEntity(namespace.id("flag"), Material.WOOD), 
   init {
     textureId = LOG.textureId
     setTranslationKey(namespace, "flag")
-    setHardness(1.0F)
+    setHardness(0F)
     setResistance(1.0F)
     setSoundGroup(WOOD_SOUND_GROUP)
     //applyBoundingBox(this)
@@ -148,7 +148,7 @@ class FlagBlock : TemplateBlockWithEntity(namespace.id("flag"), Material.WOOD), 
   }
 
   override fun neighborUpdate(world: World, x: Int, y: Int, z: Int, id: Int) {
-    println("neighbor update at $x, $y, $z");
+    //println("neighbor update at $x, $y, $z");
     breakIfCannotPlaceAt(world, x, y, z);
   }
   fun breakIfCannotPlaceAt(world: World, x: Int, y: Int, z: Int) {
