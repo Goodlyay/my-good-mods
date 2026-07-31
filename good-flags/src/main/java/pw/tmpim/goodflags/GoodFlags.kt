@@ -3,9 +3,12 @@ package pw.tmpim.goodflags
 import net.glasslauncher.mods.gcapi3.api.ConfigRoot
 import net.mine_diver.unsafeevents.listener.EventListener
 import net.minecraft.block.Block
+import net.minecraft.item.Item
 import net.modificationstation.stationapi.api.event.block.entity.BlockEntityRegisterEvent
 import net.modificationstation.stationapi.api.event.mod.InitEvent
 import net.modificationstation.stationapi.api.event.registry.BlockRegistryEvent
+import net.modificationstation.stationapi.api.event.registry.ItemRegistryEvent
+import net.modificationstation.stationapi.api.template.item.TemplateItem
 import net.modificationstation.stationapi.api.util.Namespace
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -14,6 +17,7 @@ import pw.tmpim.goodflags.block.FlagBlockEntity
 import pw.tmpim.goodflags.block.FlagPoleBlock
 import pw.tmpim.goodflags.config.CONFIG_KEY
 import pw.tmpim.goodflags.config.GoodFlagsConfig
+import pw.tmpim.goodflags.item.PaletteItem
 
 object GoodFlags {
   const val MOD_ID = "good-flags"
@@ -40,6 +44,16 @@ object GoodFlags {
     log.info("$MOD_NAME registering blocks")
     flagBlock = FlagBlock()
     flagPoleBlock = FlagPoleBlock()
+  }
+
+
+  lateinit var paletteItem: Item;
+
+  @EventListener
+  fun onRegisterItems(event: ItemRegistryEvent) {
+    log.info("$MOD_NAME registering items")
+    //ZTODO Add brush items
+    paletteItem = PaletteItem()
   }
 
   @EventListener
