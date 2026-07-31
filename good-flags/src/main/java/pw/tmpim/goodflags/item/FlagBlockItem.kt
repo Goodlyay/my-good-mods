@@ -22,6 +22,11 @@ import org.lwjgl.opengl.GL11
 import pw.tmpim.goodflags.GoodFlags
 import pw.tmpim.goodflags.block.FlagSpec
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_PALETTE_SIZE
+import pw.tmpim.goodflags.block.FlagSpec.PREVIEW_DEFAULT_BASERES
+import pw.tmpim.goodflags.block.FlagSpec.PREVIEW_DEFAULT_OFFSETX
+import pw.tmpim.goodflags.block.FlagSpec.PREVIEW_DEFAULT_OFFSETY
+import pw.tmpim.goodflags.block.FlagSpec.PREVIEW_DEFAULT_WIDTH
+import pw.tmpim.goodflags.block.FlagSpec.PREVIEW_DEFAULT_HEIGHT
 import pw.tmpim.goodflags.client.FlagBlockEntityRenderer.Companion.getTexturedFlagPixel
 
 /**
@@ -74,12 +79,12 @@ class FlagBlockItem(id: Int) : BlockItem(id), ItemWithRenderer {
     if (pixels.size != FlagSpec.FLAG_WIDTH * FlagSpec.FLAG_HEIGHT) return
 
     // Flag preview area within the item icon — driven by config
-    val baseRes     = cfg.itemTextureResolution ?: 16
+    val baseRes     = cfg.itemTextureResolution ?: PREVIEW_DEFAULT_BASERES
     val scale       = 16.0 / baseRes // pixel scale factor relative to standard 16×16
-    val flagOffsetX = cfg.flagPreviewX ?: 1
-    val flagOffsetY = cfg.flagPreviewY ?: 3
-    val previewW    = cfg.flagPreviewWidth ?: 14
-    val previewH    = cfg.flagPreviewHeight ?: 12
+    val flagOffsetX = cfg.flagPreviewX ?: PREVIEW_DEFAULT_OFFSETX
+    val flagOffsetY = cfg.flagPreviewY ?: PREVIEW_DEFAULT_OFFSETY
+    val previewW    = cfg.flagPreviewWidth ?: PREVIEW_DEFAULT_WIDTH
+    val previewH    = cfg.flagPreviewHeight ?: PREVIEW_DEFAULT_HEIGHT
 
     // Downsample the 48x32 canvas into preview size using mode sampling.
     // Each preview pixel covers a rectangular region of the source canvas.

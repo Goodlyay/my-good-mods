@@ -2,6 +2,11 @@ package pw.tmpim.goodflags.config
 
 import net.glasslauncher.mods.gcapi3.api.ConfigEntry
 import pw.tmpim.goodflags.GoodFlags.MOD_ID
+import pw.tmpim.goodflags.block.FlagSpec.PREVIEW_DEFAULT_BASERES
+import pw.tmpim.goodflags.block.FlagSpec.PREVIEW_DEFAULT_OFFSETX
+import pw.tmpim.goodflags.block.FlagSpec.PREVIEW_DEFAULT_OFFSETY
+import pw.tmpim.goodflags.block.FlagSpec.PREVIEW_DEFAULT_WIDTH
+import pw.tmpim.goodflags.block.FlagSpec.PREVIEW_DEFAULT_HEIGHT
 
 internal const val CONFIG_KEY = "gui.${MOD_ID}.config"
 private const val C = CONFIG_KEY
@@ -25,7 +30,7 @@ class GoodFlagsConfig {
     minValue = 1.0,
     maxValue = 512.0,
   )
-  var itemTextureResolution: Int? = 16
+  var itemTextureResolution: Int? = PREVIEW_DEFAULT_BASERES
 
   @JvmField
   @ConfigEntry(
@@ -36,7 +41,7 @@ class GoodFlagsConfig {
     minValue = 0.0,
     maxValue = 512.0,
   )
-  var flagPreviewX: Int? = 3
+  var flagPreviewX: Int? = PREVIEW_DEFAULT_OFFSETX
 
   @JvmField
   @ConfigEntry(
@@ -47,7 +52,7 @@ class GoodFlagsConfig {
     minValue = 0.0,
     maxValue = 512.0,
   )
-  var flagPreviewY: Int? = 0
+  var flagPreviewY: Int? = PREVIEW_DEFAULT_OFFSETY
 
   @JvmField
   @ConfigEntry(
@@ -58,7 +63,7 @@ class GoodFlagsConfig {
     minValue = 1.0,
     maxValue = 512.0,
   )
-  var flagPreviewWidth: Int? = 12
+  var flagPreviewWidth: Int? = PREVIEW_DEFAULT_WIDTH
 
   @JvmField
   @ConfigEntry(
@@ -69,5 +74,5 @@ class GoodFlagsConfig {
     minValue = 1.0,
     maxValue = 512.0,
   )
-  var flagPreviewHeight: Int? = 8
+  var flagPreviewHeight: Int? = PREVIEW_DEFAULT_HEIGHT
 }

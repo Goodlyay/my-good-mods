@@ -4,10 +4,16 @@ object FlagSpec {
   const val FLAG_WIDTH = 16
   const val FLAG_HEIGHT = 16
 
-  const val FLAG_PALETTE_SIZE = 24;
-  const val FLAG_PALETTE_WHITE = 16;
+  const val FLAG_PALETTE_SIZE = 24
+  const val FLAG_PALETTE_WHITE = 16
   const val FLAG_THICKNESS = 0.0625
   const val FLAG_WALL_FLOAT = 0.03125
+
+  const val PREVIEW_DEFAULT_BASERES = 16
+  const val PREVIEW_DEFAULT_OFFSETX = 1
+  const val PREVIEW_DEFAULT_OFFSETY = 3
+  const val PREVIEW_DEFAULT_WIDTH = 14
+  const val PREVIEW_DEFAULT_HEIGHT = 12
 
   val colors = longArrayOf(
     0x3D2F35,
