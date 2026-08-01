@@ -14,6 +14,7 @@ import net.modificationstation.stationapi.api.client.texture.SpriteContents
 import net.modificationstation.stationapi.api.client.texture.atlas.Atlases
 import org.lwjgl.opengl.GL11
 import org.lwjgl.util.vector.Vector3f
+import pw.tmpim.goodflags.block.FlagBlock
 import pw.tmpim.goodflags.block.FlagBlockEntity
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_HEIGHT
 import pw.tmpim.goodflags.block.FlagSpec.FLAG_PALETTE_SIZE
@@ -33,26 +34,26 @@ class FlagBlockEntityRenderer : BlockEntityRenderer() {
     val meta = entity.world?.getBlockMeta(entity.x, entity.y, entity.z) ?: 0
     // meta: 0=south, 1=west, 2=north, 3=east (player facing direction when placed)
     val rotation = when (meta) {
-      0 -> 0.0F    // south
-      1 -> 90.0F   // west
-      2 -> 180.0F  // north
-      3 -> 270.0F  // east
+      FlagBlock.NORTH4 -> 0.0F
+      FlagBlock.EAST1 -> 90.0F
+      FlagBlock.SOUTH3 -> 180.0F
+      FlagBlock.WEST2 -> 270.0F
       else -> 0.0F
     }
 
     val light = dispatcher.world.getNaturalBrightness(entity.x, entity.y, entity.z, 0)
     val xLight = when (meta) {
-      0 -> light * 0.8f
-      1 -> light * 0.6f
-      2 -> light * 0.8f
-      3 -> light * 0.6f
+      FlagBlock.NORTH4 -> light * 0.8f
+      FlagBlock.EAST1 -> light * 0.6f
+      FlagBlock.SOUTH3  -> light * 0.8f
+      FlagBlock.WEST2  -> light * 0.6f
       else -> 0.4f
     }
     val zLight = when (meta) {
-      0 -> light * 0.6f
-      1 -> light * 0.8f
-      2 -> light * 0.6f
-      3 -> light * 0.8f
+      FlagBlock.NORTH4 -> light * 0.6f
+      FlagBlock.EAST1 -> light * 0.8f
+      FlagBlock.SOUTH3  -> light * 0.6f
+      FlagBlock.WEST2  -> light * 0.8f
       else -> 0.4f
     }
     val yLight = light * 0.4f

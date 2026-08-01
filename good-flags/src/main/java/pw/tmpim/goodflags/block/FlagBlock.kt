@@ -22,6 +22,7 @@ import pw.tmpim.goodflags.item.FlagBlockItem
 import pw.tmpim.goodflags.net.FlagNetworkingS2C
 import pw.tmpim.goodutils.block.OnPlaceItemStack
 import pw.tmpim.goodutils.net.sendToPlayer
+import java.util.*
 
 @HasCustomBlockItemFactory(FlagBlockItem::class)
 class FlagBlock : TemplateBlockWithEntity(namespace.id("flag"), Material.WOOD), OnPlaceItemStack {
@@ -31,10 +32,18 @@ class FlagBlock : TemplateBlockWithEntity(namespace.id("flag"), Material.WOOD), 
     setHardness(0F)
     setResistance(1.0F)
     setSoundGroup(WOOD_SOUND_GROUP)
+    this.setTickRandomly(true)
     //applyBoundingBox(this)
   }
 
   companion object {
+    //Numbered names as a reference to what the literal values are
+    const val EAST1 = 1;
+    const val WEST2 = 2;
+    const val SOUTH3 = 3;
+    const val NORTH4 = 4;
+    const val FLOOR5 = 5;
+
     fun applyBoundingBox(block: Block) {
       block.setBoundingBox(
         0.5f - 0.0625f, 0.0f, 0.5f - 0.0625f,
@@ -65,10 +74,11 @@ class FlagBlock : TemplateBlockWithEntity(namespace.id("flag"), Material.WOOD), 
     return false
   }
 
-  override fun canPlaceAt(world: World, x: Int, y: Int, z: Int): Boolean {
-    return _canPlaceAt(world, x, y, z);
+  private fun canPlaceOn(world: World, x: Int, y: Int, z: Int): Boolean {
+    return world.shouldSuffocate(x, y, z) || world.getBlockId(x, y, z) == FENCE.id
   }
-  fun _canPlaceAt(world: World, x: Int, y: Int, z: Int): Boolean {
+
+  override fun canPlaceAt(world: World, x: Int, y: Int, z: Int): Boolean {
     if (world.shouldSuffocate(x - 1, y, z)) {
       return true
     } else if (world.shouldSuffocate(x + 1, y, z)) {
@@ -78,97 +88,115 @@ class FlagBlock : TemplateBlockWithEntity(namespace.id("flag"), Material.WOOD), 
     } else if (world.shouldSuffocate(x, y, z + 1)) {
       return true
     } else {
-      return false
+      return this.canPlaceOn(world, x, y - 1, z)
     }
   }
 
-  //Runs before onPlaced with direction: Int
+  override fun onPlaced(world: World, x: Int, y: Int, z: Int, direction: Int) {
+    var meta = world.getBlockMeta(x, y, z)
+    if (direction == 2 && world.shouldSuffocate(x, y, z + 1)) {
+      meta = NORTH4
+    }
+    if (direction == 3 && world.shouldSuffocate(x, y, z - 1)) {
+      meta = SOUTH3
+    }
+    if (direction == 4 && world.shouldSuffocate(x + 1, y, z)) {
+      meta = WEST2
+    }
+    if (direction == 5 && world.shouldSuffocate(x - 1, y, z)) {
+      meta = EAST1
+    }
+    world.setBlockMeta(x, y, z, meta)
+    println("onPlaced... meta is ${world.getBlockMeta(x, y, z)}") //TEST WITH THIS BYE :)
+  }
+
+  override fun onTick(world: World, x: Int, y: Int, z: Int, random: Random?) {
+    super.onTick(world, x, y, z, random)
+    if (world.getBlockMeta(x, y, z) == 0) {
+      this.onPlaced(world, x, y, z)
+    }
+  }
+
   override fun onPlaced(world: World, x: Int, y: Int, z: Int) {
-    println("onPlaced")
-
-    //GUESSES which direction it should be, blindly picks any wall to face away from
-    if        (world.shouldSuffocate(x - 1, y, z)) {
-      world.setBlockMeta(x, y, z, 1)
+    if (world.shouldSuffocate(x - 1, y, z)) {
+      world.setBlockMeta(x, y, z, EAST1)
     } else if (world.shouldSuffocate(x + 1, y, z)) {
-      world.setBlockMeta(x, y, z, 3)
+      world.setBlockMeta(x, y, z, WEST2)
     } else if (world.shouldSuffocate(x, y, z - 1)) {
-      world.setBlockMeta(x, y, z, 2)
+      world.setBlockMeta(x, y, z, SOUTH3)
     } else if (world.shouldSuffocate(x, y, z + 1)) {
-      world.setBlockMeta(x, y, z, 0)
+      world.setBlockMeta(x, y, z, NORTH4)
     }
-    super.onPlaced(world, x, y, z) //creates flag block entity
-  }
-  //Runs last; Final say over placement rules(?)
-  override fun onPlaced(world: World?, x: Int, y: Int, z: Int, direction: Int) {
-    println("onPlaced DIR")
-    var rot = world!!.getBlockMeta(x, y, z)
-    //CONFIRMS the direction it should face now that we know which blockFace this is being placed on
-    when (direction) {
-      2 if world.shouldSuffocate(x, y, z + 1) -> { rot = 0; }
-      3 if world.shouldSuffocate(x, y, z - 1) -> { rot = 2; }
-      4 if world.shouldSuffocate(x + 1, y, z) -> { rot = 3; }
-      5 if world.shouldSuffocate(x - 1, y, z) -> { rot = 1; }
-      else -> { }
-    }
+    println("onPlaced... meta is ${world.getBlockMeta(x, y, z)}")
 
-    world?.setBlockMeta(x, y, z, rot)
+    super.onPlaced(world, x, y, z)
+    this.breakIfCannotPlaceAt(world, x, y, z)
   }
 
+  override fun neighborUpdate(world: World, x: Int, y: Int, z: Int, id: Int) {
+    if (this.breakIfCannotPlaceAt(world, x, y, z)) {
+      val meta = world.getBlockMeta(x, y, z)
+      var DIE = false
+      if (!world.shouldSuffocate(x - 1, y, z) && meta == EAST1) {
+        DIE = true
+      }
+      if (!world.shouldSuffocate(x + 1, y, z) && meta == WEST2) {
+        DIE = true
+      }
+      if (!world.shouldSuffocate(x, y, z - 1) && meta == SOUTH3) {
+        DIE = true
+      }
+      if (!world.shouldSuffocate(x, y, z + 1) && meta == NORTH4) {
+        DIE = true
+      }
+      if (!this.canPlaceOn(world, x, y - 1, z) && meta == 5) {
+        DIE = true
+      }
+      if (DIE) {
+        //this.dropStacks(world, x, y, z, world.getBlockMeta(x, y, z))
+        world.setBlock(x, y, z, 0)
+      }
+    }
+  }
+
+  private fun breakIfCannotPlaceAt(world: World, x: Int, y: Int, z: Int): Boolean {
+    if (!this.canPlaceAt(world, x, y, z)) {
+      //this.dropStacks(world, x, y, z, world.getBlockMeta(x, y, z))
+      world.setBlock(x, y, z, 0)
+      return false
+    } else {
+      return true
+    }
+  }
   override fun raycast(world: World, x: Int, y: Int, z: Int, startPos: Vec3d?, endPos: Vec3d?): HitResult? {
     val rot = world.getBlockMeta(x, y, z) and 7
     var thick = (FLAG_THICKNESS + FLAG_WALL_FLOAT).toFloat() //thickness of frame including float-off-wall portion
     var half = FLAG_WALL_FLOAT.toFloat()
 
-    if (rot == 0) { //Faces North
+    if (rot == NORTH4) { //Faces North
       this.setBoundingBox(
         0.0f, 0.0f, 1.0f-thick,
         1.0f, 1.0f, 1.0f-half)
-    } else if (rot == 1) { //Faces East
+    } else if (rot == EAST1) { //Faces East
       this.setBoundingBox(
         half, 0.0f, 0.0f,
         thick, 1.0f, 1.0f)
-    } else if (rot == 2) { //Faces South
+    } else if (rot == SOUTH3) { //Faces South
       this.setBoundingBox(
         0.0f, 0.0f, half,
         1.0f, 1.0f, thick)
-    } else if (rot == 3) { //Faces West
+    } else if (rot == WEST2) { //Faces West
       this.setBoundingBox(
         1.0f-thick, 0.0f, 0.0f,
         1.0f-half, 1.0f, 1.0f)
     } else {
       this.setBoundingBox(
         0.0f, 0.0f, 0.0f,
-        1.0f, 1.0f, 1.0f)
+        1.0f, 1.0f, 1.0f
+      )
     }
-
     return super.raycast(world, x, y, z, startPos, endPos)
   }
-
-  override fun neighborUpdate(world: World, x: Int, y: Int, z: Int, id: Int) {
-    breakIfCannotPlaceAt(world, x, y, z);
-  }
-  fun breakIfCannotPlaceAt(world: World, x: Int, y: Int, z: Int) {
-
-    val meta = world.getBlockMeta(x, y, z)
-
-    if (meta == 1 && world.shouldSuffocate(x - 1, y, z)) {
-      return
-    } else if ( meta == 3 && world.shouldSuffocate(x + 1, y, z)) {
-      return
-    } else if (meta == 2 && world.shouldSuffocate(x, y, z - 1)) {
-      return
-    } else if ( meta == 0 && world.shouldSuffocate(x, y, z + 1)) {
-      return
-    }
-    println("breakIfCannotPlaceAt")
-
-    // Double check that we still exist before dropping a stack.
-    if (world.getBlockId(x, y, z) == this.id) {
-      //Item drop is handled in onBreak which I guess runs when world set block is changed..?
-      world.setBlock(x, y, z, 0)
-    }
-  }
-
   override fun dropStacks(world: World, x: Int, y: Int, z: Int, meta: Int, luck: Float) {
     // Don't drop anything, since we need to set NBT from the BE which is already
     // removed at this point. Our workaround is to instead drop stacks in onBreak.
